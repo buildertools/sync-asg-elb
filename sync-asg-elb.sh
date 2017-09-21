@@ -59,8 +59,10 @@ while true; do
     printf "${LOG_LINE}" $(date +%Y-%m-%dT%H:%M:%S%z) "${ASG_NAMES}" "${ELB_NAME}" "no deregistrations"
   else 
     printf "${LOG_LINE}" $(date +%Y-%m-%dT%H:%M:%S%z) "${ASG_NAMES}" "${ELB_NAME}" "$(printf "deregistering %s" "$(echo ${TO_DEREGISTER[@]} | tr -d '"' | tr -d '\n\r')")"
-    if ! aws elb deregister-instances-from-load-balancer --load-balancer-name "${ELB_NAME}" --instances $(echo ${TO_DEREGISTER[@]} | tr -d '"' | tr -d '\n\r') 2>1 1>/dev/null; then
-      printf "${LOG_LINE}" $(date +%Y-%m-%dT%H:%M:%S%z) "${ASG_NAMES}" "${ELB_NAME}" "deregistration failed"
+    if ! aws elb deregister-instances-from-load-balancer --load-balancer-name "${ELB_NAME}" --instances $(echo ${TO_DEREGISTER[@]} | tr -d '"' | tr -d '\n\r') 2>/tmp/sae-deregerr 1>/dev/null; then
+      ERR=$(tr -d "\n" </tmp/sae-deregerr | tr '"' '\"')
+      rm /tmp/sae-deregerr
+      printf "${LOG_LINE}" $(date +%Y-%m-%dT%H:%M:%S%z) "${ASG_NAMES}" "${ELB_NAME}" "deregistration failed: ${ERR}"
     fi
   fi
 
@@ -69,8 +71,10 @@ while true; do
     printf "${LOG_LINE}" $(date +%Y-%m-%dT%H:%M:%S%z) "${ASG_NAMES}" "${ELB_NAME}" "no registrations"
   else 
     printf "${LOG_LINE}" $(date +%Y-%m-%dT%H:%M:%S%z) "${ASG_NAMES}" "${ELB_NAME}" "$(printf "registering %s" "$(echo ${TO_REGISTER[@]} | tr -d '"' | tr -d '\n\r')")"
-    if ! aws elb register-instances-with-load-balancer --load-balancer-name "${ELB_NAME}" --instances $(echo ${TO_REGISTER[@]} | tr -d '"' | tr -d '\n\r') 2>1 1>/dev/null; then
-      printf "${LOG_LINE}" $(date +%Y-%m-%dT%H:%M:%S%z) "${ASG_NAMES}" "${ELB_NAME}" "registration failed"
+    if ! aws elb register-instances-with-load-balancer --load-balancer-name "${ELB_NAME}" --instances $(echo ${TO_REGISTER[@]} | tr -d '"' | tr -d '\n\r') 2>/tmp/sae-regerr 1>/dev/null; then
+      ERR=$(tr -d "\n" </tmp/sae-regerr | tr '"' '\"')
+      rm /tmp/sae-regerr
+      printf "${LOG_LINE}" $(date +%Y-%m-%dT%H:%M:%S%z) "${ASG_NAMES}" "${ELB_NAME}" "registration failed: ${ERR}"
     fi
   fi
 
