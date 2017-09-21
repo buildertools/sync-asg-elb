@@ -27,4 +27,4 @@ Use the default AWS profile in your default shared credentials file and sync the
 
 ## COPYRIGHT and LICENSE
 
-Copyright 2017 Jeff Nickoloff "jeff@allingeek.com" see [./LICENSE]
+Copyright 2017 Jeff Nickoloff "jeff@allingeek.com" see [LICENSE](./LICENSE)
